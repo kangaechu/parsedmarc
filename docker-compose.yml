@@ -14,6 +14,8 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.4
     environment:
       - discovery.type=single-node
+    volumes:
+      - esdata01:/usr/share/elasticsearch/data
 
   grafana:
     build: ./grafana/
@@ -23,3 +25,21 @@ services:
     environment:
       GF_INSTALL_PLUGINS: grafana-piechart-panel,grafana-worldmap-panel
       GF_AUTH_ANONYMOUS_ENABLED: 'true'
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.4
+    container_name: kibana
+    ports:
+      - 5601:5601
+    volumes:
+      - kibanadata:/usr/share/kibana/data
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    restart: always
+volumes:
+  esdata01:
+    driver: local
+  kibanadata:
+    driver: local
